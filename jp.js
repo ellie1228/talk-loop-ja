@@ -23,3 +23,5 @@ compare = (text, c) => { const t = jaNorm(text); return !!t && [c.en, ...(c.alt 
 window.EXTRA_PROGRESS = [];
 $('modeDrill').hidden = true;
 $('modeDrill').closest('.seg').hidden = true;
+// 첫 카드가 이 파일보다 먼저 그려졌으면(느린 연결) 다시 그린다
+if (typeof current !== 'undefined' && current) $('english').innerHTML = jpHtml(current);
