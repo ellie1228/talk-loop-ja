@@ -101,6 +101,16 @@ function wordPool() {
   if (order === 'new') a = a.filter(w => !wordStat(w.id).tries);
   return a;
 }
+function wordImage(w) {
+  const m = window.WORD_IMAGES?.[w.en]; if (!m) return null;
+  const data = window.WORD_IMG_DATA?.[m.file];
+  return { ...m, src: data ? 'data:image/jpeg;base64,' + data : 'word-img/' + m.file };
+}
+function wordCredit() {
+  let el = $('wordCredit');
+  if (!el) { el = document.createElement('p'); el.id = 'wordCredit'; el.className = 'credit'; $('wordEmoji').after(el); }
+  return el;
+}
 function wordNext() {
   const pool = wordPool(); W.shown = false;
   $('wordAnswer').hidden = true; $('wordGrading').hidden = true; $('wordReveal').hidden = false;
@@ -109,7 +119,11 @@ function wordNext() {
   const cat = (window.WORD_CATS || []).find(c => c.id === w.cat);
   $('wordCatName').textContent = cat ? cat.emoji + ' ' + cat.title : '';
   $('wordPos').textContent = (pool.indexOf(w) + 1) + ' / ' + pool.length;
-  $('wordEmoji').textContent = w.emoji;
+  // 사진이 있으면 사진(영어판), 없으면 이모지. 사진 아래에 만든 사람·라이선스를 작게 표시한다.
+  const pic = wordImage(w);
+  $('wordEmoji').classList.toggle('has-photo', !!pic);
+  if (pic) { $('wordEmoji').innerHTML = `<img src="${pic.src}" alt="${esc(w.ko)}">`; } else { $('wordEmoji').textContent = w.emoji; }
+  wordCredit().innerHTML = pic ? `사진: <a href="${esc(pic.page_url)}" target="_blank" rel="noopener">${esc(pic.creator)}</a> · ${esc(pic.license)}` : '';
   // 이모지만으로 헷갈리지 않게 그림 바로 아래에 한국어 뜻(기본 켜짐). 끄면 힌트가 있는 단어만 힌트 표시.
   $('wordHint').textContent = $('wordKo').checked ? w.ko : (w.hint || '');
   $('wordHint').classList.toggle('ko', $('wordKo').checked);
